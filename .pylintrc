@@ -1,2 +1,2 @@
 [MASTER]
-load-plugins=no_try_except
+load-plugins=pylint_custom.no_try_except,pylint_custom.min_var_length,pylint_custom.no_var_rename

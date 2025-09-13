@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 import os
 
-from sqlalchemy import ForeignKey, Integer, String, create_engine
+from sqlalchemy import ForeignKey, Integer, String, UniqueConstraint, create_engine
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship
 
 
@@ -14,15 +14,15 @@ class Base(DeclarativeBase):
     pass
 
 
-class RuleSource(Base):
-    __tablename__ = "rule_sources"
+class LinkDir(Base):
+    __tablename__ = "link_dirs"
 
-    source_inode: Mapped[int] = mapped_column(Integer, primary_key=True)
+    link_inode: Mapped[int] = mapped_column(Integer, primary_key=True)
     recent_name: Mapped[str] = mapped_column(String, nullable=False)
     parent_dir: Mapped[str | None] = mapped_column(String, nullable=True)
 
     rules: Mapped[list["Rule"]] = relationship(
-        back_populates="source",
+        back_populates="link",
         cascade="all, delete-orphan",
         lazy="selectin",
     )
@@ -31,14 +31,19 @@ class RuleSource(Base):
 class Rule(Base):
     __tablename__ = "rules"
 
-    source_inode: Mapped[int] = mapped_column(
-        ForeignKey("rule_sources.source_inode", ondelete="CASCADE"), primary_key=True
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    link_inode: Mapped[int] = mapped_column(
+        ForeignKey("link_dirs.link_inode", ondelete="CASCADE"), nullable=False
     )
-    target_inode: Mapped[int] = mapped_column(Integer, primary_key=True)
+    target_inode: Mapped[int] = mapped_column(Integer, nullable=False)
     target_name: Mapped[str] = mapped_column(String, nullable=False)
     target_path: Mapped[str] = mapped_column(String, nullable=False)
 
-    source: Mapped[RuleSource] = relationship(back_populates="rules")
+    __table_args__ = (
+        UniqueConstraint("link_inode", "target_inode", name="uq_rule_pair"),
+    )
+
+    link: Mapped[LinkDir] = relationship(back_populates="rules")
 
 
 def get_session() -> Session:
@@ -53,7 +58,7 @@ def get_session() -> Session:
 __all__ = [
     "DEFAULT_DB",
     "Base",
-    "RuleSource",
+    "LinkDir",
     "Rule",
     "get_session",
 ]
