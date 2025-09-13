@@ -18,21 +18,70 @@ def _norm_dst(p: Path | str) -> Path:
 
 
 def _same_symlink(dst: Path, src: Path) -> bool:
+    """Return True if `dst` is a symlink pointing to `src`.
+
+    Handles Windows/Unix differences, relative link targets, and case.
+    """
     if not dst.is_symlink():
         return False
+
     try:
-        target = Path(os.readlink(dst)).resolve()
+        raw_target = os.readlink(dst)
     except OSError:
         return False
-    return target == src.resolve()
+
+    # If the stored link target is relative, resolve it relative to the link's directory
+    target_path = Path(raw_target)
+    if not target_path.is_absolute():
+        target_path = (dst.parent / target_path).resolve()
+    else:
+        target_path = target_path.resolve()
+
+    # Prefer filesystem-level comparison to avoid casing/UNC differences
+    try:
+        return target_path.samefile(src)
+    except (FileNotFoundError, OSError):
+        # Fallback to normalized string comparison
+        return os.path.normcase(str(target_path)) == os.path.normcase(str(src.resolve()))
 
 
-def _echo_rule(src: Path, dst: Path, replaced: bool) -> None:
+def _echo_rule(src: Path, dst: Path, replace: bool, new: bool) -> None:
     src_s = typer.style(str(src), fg=typer.colors.GREEN)
     dst_s = typer.style(str(dst), fg=typer.colors.WHITE)
-    suffix = " " + typer.style("replaced", fg=typer.colors.RED) if replaced else ""
+    suffix = ""
+    suffix = suffix + " " + typer.style("replace", fg=typer.colors.RED) if replace else suffix
+    if replace:
+        # get count of files in dst
+        if dst.is_dir() and not dst.is_symlink():
+            count = sum(1 for _ in dst.rglob('*'))
+            suffix = suffix + f" ({count} items)" if count > 0 else suffix
+    suffix = suffix + " " + typer.style("new", fg=typer.colors.BLUE) if new else suffix
     typer.echo(f"link: ({src_s}) => {dst_s}{suffix}")
 
+def pick_folder(dir: str | Path):
+    """
+    use minifzf python package to pick a folder given a base {dir}
+    return picked folder 
+    """
+    from minifzf import minifzf
+
+    base_path = Path(dir).expanduser().resolve()
+    if not base_path.is_dir():
+        raise ValueError(f"{base_path} is not a valid directory")
+
+    # List all subdirectories
+    subdirs = [str(p.relative_to(base_path)) for p in base_path.rglob('*') if p.is_dir()]
+
+    if not subdirs:
+        raise ValueError(f"No subdirectories found in {base_path}")
+
+    # Use minifzf to pick a directory
+    picked = minifzf(subdirs, prompt="Select a folder: ")
+
+    if picked is None:
+        raise ValueError("No folder selected")
+
+    return base_path / picked
 
 def link_command(
     src: Path = typer.Argument(
@@ -43,7 +92,7 @@ def link_command(
     ),
 ) -> None:
     """Create or replace a symlink at dst pointing to src."""
-
+    
     src_p = _norm_src(src)
     dst_p = _norm_dst(dst)
 
@@ -52,7 +101,7 @@ def link_command(
         return
 
     # Preview
-    _echo_rule(src_p, dst_p, replaced=dst_p.exists() or dst_p.is_symlink())
+    _echo_rule(src_p, dst_p, replace=dst_p.exists() or dst_p.is_symlink(), new=not dst_p.exists())
 
     if not typer.confirm("Proceed?"):
         typer.echo("aborted")

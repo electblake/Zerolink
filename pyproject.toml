@@ -1,10 +1,11 @@
 [project]
 name = "zerolink"
 version = "0.1.0"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.11"
 dependencies = [
+    "minifzf>=0.1.4",
     "pylint>=3.3.8",
-    "rich>=14.1.0",
+    "rich==13.7.0",
     "sqlalchemy>=2.0.43",
     "typer>=0.17.4",
 ]
@@ -16,3 +17,7 @@ zerolink = "zerolink.cli:app"
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+# Only package the actual application code; exclude local pylint plugins
+include = ["zerolink*"]
+exclude = ["pylint_custom*"]
