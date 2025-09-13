@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 import shutil
 from pathlib import Path
 
@@ -100,8 +101,69 @@ def link_command(
         typer.echo("already linked; nothing to do")
         return
 
-    # Preview
-    _echo_rule(src_p, dst_p, replace=dst_p.exists() or dst_p.is_symlink(), new=not dst_p.exists())
+    # If destination exists as a real directory and has files, offer to move them to src via rclone
+    if dst_p.is_dir() and not dst_p.is_symlink():
+        file_count = sum(1 for p in dst_p.rglob('*') if p.is_file())
+        if file_count > 0:
+            typer.echo(
+                typer.style(
+                    f"Found {file_count} files in existing destination directory.",
+                    fg=typer.colors.YELLOW,
+                )
+            )
+            rclone_args = [
+                "rclone",
+                "move",
+                "--progress",
+                "--checksum",
+                "--delete-empty-src-dirs",
+                str(dst_p),
+                str(src_p),
+            ]
+            pretty_cmd = ' '.join(
+                [arg if ' ' not in arg else f'"{arg}"' for arg in rclone_args]
+            )
+            typer.echo(f"Proposed: {pretty_cmd}")
+            if typer.confirm("Run this rclone move before linking?"):
+                try:
+                    result = subprocess.run(rclone_args, check=True)
+                except FileNotFoundError:
+                    typer.echo(
+                        typer.style(
+                            "rclone not found on PATH. Aborting move.", fg=typer.colors.RED
+                        )
+                    )
+                    return
+                except subprocess.CalledProcessError as e:
+                    typer.echo(
+                        typer.style(
+                            f"rclone move failed with exit code {e.returncode}.",
+                            fg=typer.colors.RED,
+                        )
+                    )
+                    return
+                # Recount after move
+                remaining = sum(1 for p in dst_p.rglob('*') if p.is_file())
+                if remaining > 0:
+                    typer.echo(
+                        typer.style(
+                            f"Warning: {remaining} files still remain in destination after move.",
+                            fg=typer.colors.RED,
+                        )
+                    )
+                    if not typer.confirm(
+                        "Proceed to replace the directory with a symlink anyway?"
+                    ):
+                        typer.echo("aborted")
+                        return
+
+    # Preview of the link operation
+    _echo_rule(
+        src_p,
+        dst_p,
+        replace=dst_p.exists() or dst_p.is_symlink(),
+        new=not dst_p.exists(),
+    )
 
     if not typer.confirm("Proceed?"):
         typer.echo("aborted")
