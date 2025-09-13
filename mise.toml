@@ -1,0 +1,5 @@
+[tools]
+python = "3.10"
+
+[env]
+UV_CONFIG_FILE="uv.toml"

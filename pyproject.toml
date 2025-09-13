@@ -1,0 +1,17 @@
+[project]
+name = "zerolink"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "pylint>=3.3.8",
+    "sqlalchemy>=2.0.43",
+    "typer>=0.17.4",
+]
+
+[project.scripts]
+zerolink = "zerolink.cli:app"
+
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+

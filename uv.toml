@@ -1,0 +1,5 @@
+## uv configuration for this project
+## Keep uv’s cache inside the repo folder.
+
+# Place uv's cache under ./.uv/cache (relative to this file)
+cache-dir = ".uv/cache"

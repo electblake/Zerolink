@@ -1,0 +1,11 @@
+.venv
+.env
+venv/
+__pycache__/
+*.pyc
+.uv
+.vscode/settings.json
+*.egg-info
+examples
+.agents/.trash
+load-plugins=no_var_rename
