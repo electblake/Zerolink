@@ -12,12 +12,14 @@ def norm_path(p: str | Path) -> Path:
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
-
 @app.command("init")
 def init_command() -> None:
     base = os.getenv("LOCALAPPDATA")
     db_path = Path(base) / "zerolink" / DEFAULT_DB
     if db_path.exists():
+        typer.echo(f"Database already exists: {db_path}")
+        typer.echo(f"- file size: {db_path.stat().st_size} bytes")
+
         if typer.confirm("Clear & re-initialize database?"):
             db_path.unlink()
             with get_session() as s:
