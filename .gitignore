@@ -9,3 +9,5 @@ __pycache__/
 examples
 .agents/.trash
 load-plugins=no_var_rename
+dist
+build

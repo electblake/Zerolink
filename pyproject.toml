@@ -12,6 +12,7 @@ dependencies = [
 
 [project.scripts]
 zerolink = "zerolink.cli:app"
+build-zerolink = "zerolink.build:main"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]
@@ -21,3 +22,8 @@ build-backend = "setuptools.build_meta"
 # Only package the actual application code; exclude local pylint plugins
 include = ["zerolink*"]
 exclude = ["pylint_custom*"]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.15.0",
+]
