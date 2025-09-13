@@ -5,10 +5,10 @@ from pathlib import Path
 
 import typer
 from sqlalchemy import select
-
-from zerolink.pathlib import norm_path
 from zerolink.db import get_session, RuleSource, Rule
 
+def norm_path(p: str | Path) -> Path:
+    return Path(os.path.expanduser(os.path.expandvars(str(p)))).resolve()
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
