@@ -73,16 +73,23 @@ def link_command(
     dst_p = _norm_dst(dst)
 
     if _same_symlink(dst_p, src_p):
-        typer.echo("already linked; nothing to do")
+        typer.echo("[skip] already linked; nothing to do")
         return
 
     # If destination exists as a real directory and has files, offer to move them to src via rclone
     if dst_p.is_dir() and not dst_p.is_symlink():
         file_count = sum(1 for p in dst_p.rglob('*') if p.is_file())
-        if file_count > 0:
+        if file_count == 0:
             typer.echo(
                 typer.style(
-                    f"Found {file_count} files in existing destination directory.",
+                    f"[ok] Found {file_count} files in existing destination directory.",
+                    fg=typer.colors.GREEN,
+                )
+            )
+        elif file_count > 0:
+            typer.echo(
+                typer.style(
+                    f"[warn] Found {file_count} files in existing destination directory.",
                     fg=typer.colors.YELLOW,
                 )
             )

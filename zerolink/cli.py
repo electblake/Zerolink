@@ -6,8 +6,13 @@ from pathlib import Path
 import typer
 from sqlalchemy import select
 from zerolink.db import get_session, LinkDir, Rule, DEFAULT_DB
+# Import isolated link command and register it without creating a dependency back to this file
+from .link_command import link_command as _isolated_link
 
 def norm_path(p: str | Path) -> Path:
+    """
+    Normalize a path by expanding user (~) and environment variables, and resolving to an absolute path.
+    """
     return Path(os.path.expanduser(os.path.expandvars(str(p)))).resolve()
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
@@ -36,10 +41,6 @@ def init_command() -> None:
 
 rules = typer.Typer(help="Manage directory linking rules")
 app.add_typer(rules, name="rules")
-
-
-# Import isolated link command and register it without creating a dependency back to this file
-from .link_command import link_command as _isolated_link
 
 app.command("link")(_isolated_link)
 
