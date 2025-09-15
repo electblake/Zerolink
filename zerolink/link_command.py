@@ -57,7 +57,8 @@ def _echo_rule(src: Path, dst: Path, replace: bool, new: bool) -> None:
             count = sum(1 for _ in dst.rglob('*'))
             suffix = suffix + f" ({count} items)" if count > 0 else suffix
     suffix = suffix + " " + typer.style("new", fg=typer.colors.BLUE) if new else suffix
-    typer.echo(f"link: ({src_s}) => {dst_s}{suffix}")
+    info = typer.style("[info]", fg=typer.colors.BRIGHT_BLACK)
+    typer.echo(f"{info} link: ({src_s}) => {dst_s}{suffix}")
 
 def link_command(
     src: Path = typer.Argument(
@@ -73,26 +74,18 @@ def link_command(
     dst_p = _norm_dst(dst)
 
     if _same_symlink(dst_p, src_p):
-        typer.echo("[skip] already linked; nothing to do")
+        typer.echo(f"{typer.style('[skip]', fg='cyan')} already linked; nothing to do")
         return
 
     # If destination exists as a real directory and has files, offer to move them to src via rclone
     if dst_p.is_dir() and not dst_p.is_symlink():
         file_count = sum(1 for p in dst_p.rglob('*') if p.is_file())
         if file_count == 0:
-            typer.echo(
-                typer.style(
-                    f"[ok] Found {file_count} files in existing destination directory.",
-                    fg=typer.colors.GREEN,
-                )
-            )
+            ok = typer.style("[ok]", fg=typer.colors.GREEN)
+            typer.echo(f"{ok} Found {file_count} files in existing destination directory.")
         elif file_count > 0:
-            typer.echo(
-                typer.style(
-                    f"[warn] Found {file_count} files in existing destination directory.",
-                    fg=typer.colors.YELLOW,
-                )
-            )
+            warn = typer.style("[warn]", fg=typer.colors.YELLOW)
+            typer.echo(f"{warn} Found {file_count} files in existing destination directory.")
             rclone_args = [
                 "rclone",
                 "move",
@@ -105,38 +98,29 @@ def link_command(
             pretty_cmd = ' '.join(
                 [arg if ' ' not in arg else f'"{arg}"' for arg in rclone_args]
             )
-            typer.echo(f"Proposed: {pretty_cmd}")
+            info = typer.style("[info]", fg=typer.colors.BRIGHT_BLACK)
+            typer.echo(f"{info} Proposed: {pretty_cmd}")
             if typer.confirm("Run this rclone move before linking?"):
                 try:
                     result = subprocess.run(rclone_args, check=True)
                 except FileNotFoundError:
-                    typer.echo(
-                        typer.style(
-                            "rclone not found on PATH. Aborting move.", fg=typer.colors.RED
-                        )
-                    )
+                    err = typer.style("[error]", fg=typer.colors.RED)
+                    typer.echo(f"{err} rclone not found on PATH. Aborting move.")
                     return
                 except subprocess.CalledProcessError as e:
-                    typer.echo(
-                        typer.style(
-                            f"rclone move failed with exit code {e.returncode}.",
-                            fg=typer.colors.RED,
-                        )
-                    )
+                    err = typer.style("[error]", fg=typer.colors.RED)
+                    typer.echo(f"{err} rclone move failed with exit code {e.returncode}.")
                     return
                 # Recount after move
                 remaining = sum(1 for p in dst_p.rglob('*') if p.is_file())
                 if remaining > 0:
-                    typer.echo(
-                        typer.style(
-                            f"Warning: {remaining} files still remain in destination after move.",
-                            fg=typer.colors.RED,
-                        )
-                    )
+                    warn = typer.style("[warn]", fg=typer.colors.YELLOW)
+                    typer.echo(f"{warn} {remaining} files still remain in destination after move.")
                     if not typer.confirm(
                         "Proceed to replace the directory with a symlink anyway?"
                     ):
-                        typer.echo("aborted")
+                        info = typer.style("[info]", fg=typer.colors.BRIGHT_BLACK)
+                        typer.echo(f"{info} aborted")
                         return
 
     # Preview of the link operation
@@ -148,7 +132,8 @@ def link_command(
     )
 
     if not typer.confirm("Proceed?"):
-        typer.echo("aborted")
+        info = typer.style("[info]", fg=typer.colors.BRIGHT_BLACK)
+        typer.echo(f"{info} aborted")
         return
 
     # Ensure parent exists
@@ -163,4 +148,5 @@ def link_command(
 
     # Create directory symlink
     os.symlink(str(src_p), str(dst_p), target_is_directory=True)
-    typer.echo("done")
+    ok = typer.style("[ok]", fg=typer.colors.GREEN)
+    typer.echo(f"{ok} done")
