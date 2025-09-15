@@ -1,5 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.building.api import EXE, PYZ
+from PyInstaller.building.build_main import Analysis
 
 a = Analysis(
     ['run_zerolink.py'],
@@ -20,8 +22,8 @@ exe = EXE(
     pyz,
     a.scripts,
     a.binaries,
+    a.zipfiles,
     a.datas,
-    [],
     name='zerolink',
     debug=False,
     bootloader_ignore_signals=False,
@@ -31,8 +33,4 @@ exe = EXE(
     runtime_tmpdir=None,
     console=True,
     disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
 )
