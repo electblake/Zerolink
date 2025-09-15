@@ -7,6 +7,7 @@ from pathlib import Path
 
 import typer
 
+from .db import add_user_list_item, get_user_setting
 
 def _norm_src(p: Path | str) -> Path:
     # Resolve the source fully (real path)
@@ -48,17 +49,19 @@ def _same_symlink(dst: Path, src: Path) -> bool:
 
 def _echo_rule(src: Path, dst: Path, replace: bool, new: bool) -> None:
     src_s = typer.style(str(src), fg=typer.colors.GREEN)
-    dst_s = typer.style(str(dst), fg=typer.colors.WHITE)
+    dst_s = typer.style(str(dst), fg=typer.colors.RED)
     suffix = ""
-    suffix = suffix + " " + typer.style("replace", fg=typer.colors.RED) if replace else suffix
+    prefix = ""
     if replace:
+        suffix = suffix + " " + typer.style("[replace]", fg=typer.colors.BRIGHT_RED) if replace else suffix
         # get count of files in dst
         if dst.is_dir() and not dst.is_symlink():
             count = sum(1 for _ in dst.rglob('*'))
             suffix = suffix + f" ({count} items)" if count > 0 else suffix
+        prefix = typer.style("[link] ", fg=typer.colors.BRIGHT_GREEN)
     suffix = suffix + " " + typer.style("new", fg=typer.colors.BLUE) if new else suffix
-    info = typer.style("[info]", fg=typer.colors.BRIGHT_BLACK)
-    typer.echo(f"{info} link: ({src_s}) => {dst_s}{suffix}")
+    prefix = typer.style("[create] ", fg=typer.colors.GREEN) if new else prefix
+    typer.echo(f"{prefix}({src_s}) => ({dst_s}){suffix}")
 
 def link_command(
     src: Path = typer.Argument(
@@ -73,7 +76,21 @@ def link_command(
     src_p = _norm_src(src)
     dst_p = _norm_dst(dst)
 
+    # Read MRU cap from user settings (default 100)
+    try:
+        max_items_s = get_user_setting("max_src_history")
+        max_items = int(max_items_s) if max_items_s else 100
+        if max_items <= 0:
+            max_items = 100
+    except Exception:
+        max_items = 100
+
     if _same_symlink(dst_p, src_p):
+        # Bump history even if already linked
+        try:
+            add_user_list_item("src_history", str(src_p), max_items=max_items)
+        except Exception:
+            pass
         typer.echo(f"{typer.style('[skip]', fg='cyan')} already linked; nothing to do")
         return
 
@@ -148,5 +165,10 @@ def link_command(
 
     # Create directory symlink
     os.symlink(str(src_p), str(dst_p), target_is_directory=True)
+    # Record src dir history (MRU capped)
+    try:
+        add_user_list_item("src_history", str(src_p), max_items=max_items)
+    except Exception:
+        pass
     ok = typer.style("[ok]", fg=typer.colors.GREEN)
     typer.echo(f"{ok} done")
