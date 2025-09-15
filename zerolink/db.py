@@ -45,7 +45,6 @@ class Rule(Base):
 
     link: Mapped[LinkDir] = relationship(back_populates="rules")
 
-
 def get_session() -> Session:
     base = os.getenv("LOCALAPPDATA")
     db_path = Path(base) / "zerolink" / DEFAULT_DB

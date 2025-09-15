@@ -1,5 +1,5 @@
 [project]
-name = "zerolink"
+name = "zerolinks"
 version = "0.1.0"
 requires-python = ">=3.10,<3.11"
 dependencies = [
@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [project.scripts]
-zerolink = "zerolink.cli:app"
+zero = "zerolink.cli:app"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]
