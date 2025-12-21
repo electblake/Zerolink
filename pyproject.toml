@@ -1,16 +1,11 @@
 [project]
 name = "zerolink"
-version = "0.1.0"
+version = "0.9.0"
+description = "symlink download folders to inbox folders and call those 'zero' folders'"
 requires-python = ">=3.10,<3.11"
-dependencies = [
-    "minifzf>=0.1.4",
-    "rich==13.7.0",
-    "sqlalchemy>=2.0.43",
-    "typer>=0.17.4",
-]
 
 [project.scripts]
-zerolink = "zerolink.cli:app"
+zerolink = "zerolink.__main__:main"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]

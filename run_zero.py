@@ -1,8 +1,8 @@
 from __future__ import annotations
-
-from zerolink.cli import app
+import typer
+from zerolink import typer_app
 
 
 if __name__ == "__main__":
-    app()
+    typer.run(typer_app)
 
