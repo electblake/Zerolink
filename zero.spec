@@ -25,7 +25,7 @@ exe = EXE(
     a.binaries,
     a.zipfiles,
     a.datas,
-    name='zero',
+    name='zerolink',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -35,4 +35,3 @@ exe = EXE(
     console=True,
     disable_windowed_traceback=False,
 )
-

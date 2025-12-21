@@ -1,5 +1,5 @@
 [project]
-name = "zerolinks"
+name = "zerolink"
 version = "0.1.0"
 requires-python = ">=3.10,<3.11"
 dependencies = [
@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [project.scripts]
-zero = "zerolink.cli:app"
+zerolink = "zerolink.cli:app"
 
 [build-system]
 requires = ["setuptools>=61", "wheel"]
@@ -25,6 +25,3 @@ dev = [
     "pylint>=3.3.8",
     "pyinstaller>=6.15.0",
 ]
-
-# [tool.uv.scripts]
-# my-custom-task = "python scripts/myscript.py" # `uv run my-custom-task`

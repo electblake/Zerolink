@@ -64,13 +64,9 @@ def init_db() -> Path:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     engine = create_engine(f"sqlite:///{db_path}", future=True)
     Base.metadata.create_all(engine)
-    # Initialize default user settings if missing
-    try:
-        if get_user_setting("max_src_history") is None:
-            set_user_setting("max_src_history", "100")
-    except Exception:
-        # Don't block init if settings fail; user can re-run later
-        pass
+    # Initialize default user settings
+    if get_user_setting("max_src_history") is None:
+        set_user_setting("max_src_history", "100")
     return db_path
 
 

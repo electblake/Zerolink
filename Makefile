@@ -1,6 +1,6 @@
 SHELL := sh
 
-APP := zero
+APP := zerolink
 SPEC := zero.spec
 # Derive version from pyproject.toml (simple regex; no extra tools)
 VER := $(shell python -c "import re,io;print(re.search(r'^version\\s*=\\s*\\\"([^\\\"]+)\\\"', io.open('pyproject.toml','r',encoding='utf-8').read(), re.M).group(1))")
@@ -67,7 +67,7 @@ install: build
 	ls "$$destexe"; \
 	echo ''; \
 	echo '[alias] PowerShell (copy/paste):'; \
-	echo '  Set-Alias -Name zero -Value "$$env:LOCALAPPDATA\\zerolink\\Scripts\\zero.exe"'
+	echo '  Set-Alias -Name zero -Value "$$env:LOCALAPPDATA\\zerolink\\Scripts\\zerolink.exe"'; \
 
 wheel:
 	set -eu; \
