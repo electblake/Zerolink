@@ -12,3 +12,4 @@ load-plugins=no_var_rename
 dist
 build
 .agents
+*.spec

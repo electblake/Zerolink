@@ -1,5 +1,16 @@
 [tools]
-python = "3.10"
+python = "3.10.16"
 
 [env]
 UV_CONFIG_FILE="uv.toml"
+UV_LINK_MODE="copy"
+_.path = [".venv",".venv/Scripts"]
+
+[tasks.build]
+run = "pwsh -NoProfile -File scripts/Invoke-Build.ps1"
+
+[tasks.clean]
+run = "pwsh -NoProfile -File scripts/Invoke-Clean.ps1"
+
+[tasks.init]
+run = "pwsh -NoProfile -Command uv venv --python 3.10.16 --seed"
