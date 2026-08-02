@@ -10,10 +10,13 @@ are not backfilled here.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-02
+
 ### Added
 - Introduced `--install-menu` and `--uninstall-menu` to manage the Windows File Explorer context-menu entry.
 - Prompted for the canonical path when only the input folder was supplied.
 - Prompted to create a missing canonical path before linking.
+- Added `mise run release` to build and publish a versioned Windows x64 executable to GitHub Releases.
 
 ### Changed
 - Split the CLI implementation into `zerolink.cli` and kept `zerolink.__main__` as the executable wrapper.
