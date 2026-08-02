@@ -1,6 +1,6 @@
 [project]
 name = "zerolink"
-version = "0.10.0"
+version = "0.10.1"
 description = "one-step rclone and symlink folders"
 requires-python = ">=3.10,<3.11"
 dependencies = [

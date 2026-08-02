@@ -10,6 +10,13 @@ are not backfilled here.
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-08-02
+
+### Changed
+- Corrected author and committer attribution throughout the Git history to use the `electblake` identity.
+- Updated the README download link and version example for the `0.10.1` release.
+- Published the complete changelog as the GitHub release notes.
+
 ## [0.10.0] - 2026-08-02
 
 ### Added

@@ -22,4 +22,4 @@ Move-Item -LiteralPath (Join-Path $dist_dir "$program.exe") -Destination $asset_
 & $asset_path --version
 
 $commit = git rev-parse HEAD
-gh release create $tag $asset_path --target $commit --title "$program $tag" --generate-notes --latest
+gh release create $tag $asset_path --target $commit --title "$program $tag" --notes-file (Join-Path $project_root "CHANGELOG.md") --latest
