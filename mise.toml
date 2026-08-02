@@ -14,3 +14,7 @@ run = "pwsh -NoProfile -File scripts/Invoke-Clean.ps1"
 
 [tasks.init]
 run = "pwsh -NoProfile -Command uv venv --python 3.10.16 --seed"
+
+[tasks.release]
+description = "Build the current Windows x64 executable and publish a tagged GitHub release"
+run = "pwsh -NoProfile -File release.ps1"
