@@ -10,6 +10,11 @@ are not backfilled here.
 
 ## [Unreleased]
 
+## [0.10.2] - 2026-08-05
+
+### Changed
+- Bumped the patch version and refreshed release documentation.
+
 ## [0.10.1] - 2026-08-02
 
 ### Changed

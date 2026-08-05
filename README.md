@@ -10,7 +10,7 @@ folder.
 
 ## Install the packaged app
 
-Download [`zerolink-v0.10.1-windows-x64.exe`](https://github.com/electblake/zerolink/releases/download/v0.10.1/zerolink-v0.10.1-windows-x64.exe)
+Download [`zerolink-v0.10.2-windows-x64.exe`](https://github.com/electblake/zerolink/releases/download/v0.10.2/zerolink-v0.10.2-windows-x64.exe)
 from the [latest GitHub release](https://github.com/electblake/zerolink/releases/latest),
 rename it to `zerolink.exe`, and place it in a permanent location. The File
 Explorer entry records this exact path, so do not move the executable after
@@ -94,5 +94,5 @@ optional arguments:
 
 ```console
 > zerolink --version
-zerolink 0.10.1
+zerolink 0.10.2
 ```
